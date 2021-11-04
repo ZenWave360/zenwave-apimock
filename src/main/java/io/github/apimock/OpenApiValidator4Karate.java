@@ -3,6 +3,7 @@ package io.github.apimock;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.intuit.karate.StringUtils;
 import com.intuit.karate.core.MockHandlerHook;
 import com.intuit.karate.http.HttpUtils;
 import org.openapi4j.core.exception.ResolutionException;
@@ -155,7 +157,7 @@ public class OpenApiValidator4Karate {
         try {
             this.validator.validate(request, path, operation);
         } catch (ValidationException e) {
-            for(ValidationResults.ValidationItem item: e.results().items()) {
+            for(org.openapi4j.core.validation.ValidationResults.ValidationItem item: e.results().items()) {
                 // skip "nullable: false" errors as they are not correctly used in java apis
                 if (!Integer.valueOf(1021).equals(item.code()) || !ignoreNoNullable) {
                     results.add(item);
@@ -179,7 +181,7 @@ public class OpenApiValidator4Karate {
         final Operation operation = this.api.getOperationById(operationId);
         if (operation.getResponse(String.valueOf(status)) == null) {
             // response code is not defined
-            results.add(new ValidationResult(ERROR, null, String.format("Status code %s not found for operationId %s", status, operationId)));
+            results.add(String.format("Status code %s not found for operationId %s", status, operationId));
             return results;
         }
         final Map<String, MediaType> mediaTypes = this.getMediaTypes(operation, response.getStatus());
@@ -191,7 +193,7 @@ public class OpenApiValidator4Karate {
         try {
             this.validator.validate(response, path, operation);
         } catch (ValidationException e) {
-            for(ValidationResults.ValidationItem item: e.results().items()) {
+            for(org.openapi4j.core.validation.ValidationResults.ValidationItem item: e.results().items()) {
                 // skip "nullable: false" errors as they are not correctly used in java apis
                 if (!Integer.valueOf(1021).equals(item.code()) || !ignoreNoNullable) {
                     results.add(item);
@@ -212,5 +214,22 @@ public class OpenApiValidator4Karate {
 
     private static String fixUrl(String url) {
         return url.startsWith("/")? url : "/" + url;
+    }
+
+    public static class ValidationResults {
+
+        final List<StringUtils.Pair> items = new ArrayList<>();
+
+        public boolean isValid() {
+            return items.isEmpty();
+        }
+
+        void add(org.openapi4j.core.validation.ValidationResults.ValidationItem item) {
+            items.add(new StringUtils.Pair(item.dataCrumbs(), item.message()));
+        }
+
+        void add(String message) {
+            items.add(new StringUtils.Pair("", message));
+        }
     }
 }

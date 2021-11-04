@@ -22,7 +22,7 @@ public class RestClientExampleTest {
     public void setup() throws Exception {
         server = MockServer.builder()
                 .openapi("classpath:petstore/petstore-openapi.yml")
-                .features("classpath:petstore/mocks/PetMock/PetMock.feature")
+                // .features("classpath:petstore/mocks/PetMock/PetMock.feature")
                 .pathPrefix("api/v3")
                 .http(0).build();
     }

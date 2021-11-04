@@ -16,7 +16,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <karate.version>1.2.0.RC1</karate.version>
-        <armeria.version>1.12.0</armeria.version>
+        <armeria.version>1.13.4</armeria.version>
         <openapi4j.version>1.0.7</openapi4j.version>
     </properties>
 
@@ -30,102 +30,40 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>io.github.apimock.Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>com.intuit.karate:*</exclude>
-                                    <exclude>com.linecorp.armeria</exclude>
-                                    <exclude>org.graalvm.js:*</exclude>
-                                    <exclude>org.graalvm.sdk:graal-sdk</exclude>
-                                    <exclude>org.graalvm.js</exclude>
-                                    <exclude>org.graalvm.regex:regex</exclude>
-                                    <exclude>org.graalvm.truffle:truffle-api</exclude>
-                                    <exclude>com.ibm.icu:icu4j</exclude>
-                                    <exclude>ch.qos.logback</exclude>
-                                    <exclude>org.slf4j:*</exclude>
-                                    <exclude>com.jayway.jsonpath:json-path</exclude>
-                                    <exclude>net.minidev:*</exclude>
-                                    <exclude>org.ow2.asm:asm</exclude>
-                                    <exclude>info.cukes:*</exclude>
-                                    <exclude>org.yaml:snakeyaml</exclude>
-                                    <exclude>de.siegmar:fastcsv</exclude>
-                                    <exclude>info.picocli:picocli</exclude>
-                                </excludes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.openapi4j.</pattern>
-                                    <shadedPattern>apimock.org.openapi4j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.fasterxml.jackson.</pattern>
-                                    <shadedPattern>apimock.com.fasterxml.jackson.</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>io.github.apimock.Main</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.1.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-rest-api</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <skip>true</skip>
-                            <inputSpec>src/test/resources/petstore/petstore-openapi.yml</inputSpec>
-                            <generatorName>java</generatorName>
-                            <modelNameSuffix>Dto</modelNameSuffix>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <library>resttemplate</library>
-                            <configOptions>
-                                <basePackage>io.github.apimock.petstore.client</basePackage>
-                                <modelPackage>io.github.apimock.petstore.client.model</modelPackage>
-                                <apiPackage>io.github.apimock.petstore.client.api</apiPackage>
-                                <configPackage>io.github.apimock.petstore.client.config</configPackage>
-                                <dateLibrary>java8</dateLibrary>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.openapitools</groupId>-->
+<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--                <version>5.3.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>generate-rest-api</id>-->
+<!--                        <phase>generate-test-sources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <skip>true</skip>-->
+<!--                            <inputSpec>src/test/resources/petstore/petstore-openapi.yml</inputSpec>-->
+<!--                            <generatorName>java</generatorName>-->
+<!--                            <modelNameSuffix>Dto</modelNameSuffix>-->
+<!--                            <generateApiTests>false</generateApiTests>-->
+<!--                            <generateModelTests>false</generateModelTests>-->
+<!--                            <library>resttemplate</library>-->
+<!--                            <addCompileSourceRoot>false</addCompileSourceRoot>-->
+<!--                            <addTestCompileSourceRoot>true</addTestCompileSourceRoot>-->
+<!--                            <configOptions>-->
+<!--                                <basePackage>io.github.apimock.petstore.client</basePackage>-->
+<!--                                <modelPackage>io.github.apimock.petstore.client.model</modelPackage>-->
+<!--                                <apiPackage>io.github.apimock.petstore.client.api</apiPackage>-->
+<!--                                <configPackage>io.github.apimock.petstore.client.config</configPackage>-->
+<!--                                <dateLibrary>java8</dateLibrary>-->
+<!--                            </configOptions>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
     </build>
 
 	<dependencies>
@@ -178,6 +116,78 @@
             <version>1.6.2</version>
             <scope>test</scope>
         </dependency>
-
      </dependencies>
+
+    <profiles>
+        <profile>
+            <id>fatjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>io.github.apimock.Main</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactSet>
+                                        <excludes>
+                                            <exclude>com.intuit.karate:*</exclude>
+                                            <exclude>com.linecorp.armeria</exclude>
+                                            <exclude>org.graalvm.js:*</exclude>
+                                            <exclude>org.graalvm.sdk:graal-sdk</exclude>
+                                            <exclude>org.graalvm.js</exclude>
+                                            <exclude>org.graalvm.regex:regex</exclude>
+                                            <exclude>org.graalvm.truffle:truffle-api</exclude>
+                                            <exclude>com.ibm.icu:icu4j</exclude>
+                                            <exclude>ch.qos.logback</exclude>
+                                            <exclude>org.slf4j:*</exclude>
+                                            <exclude>com.jayway.jsonpath:json-path</exclude>
+                                            <exclude>net.minidev:*</exclude>
+                                            <exclude>org.ow2.asm:asm</exclude>
+                                            <exclude>info.cukes:*</exclude>
+                                            <exclude>org.yaml:snakeyaml</exclude>
+                                            <exclude>de.siegmar:fastcsv</exclude>
+                                            <exclude>info.picocli:picocli</exclude>
+                                        </excludes>
+                                    </artifactSet>
+                                    <relocations>
+                                        <relocation>
+                                            <pattern>org.openapi4j.</pattern>
+                                            <shadedPattern>apimock.org.openapi4j</shadedPattern>
+                                        </relocation>
+                                        <relocation>
+                                            <pattern>com.fasterxml.jackson.</pattern>
+                                            <shadedPattern>apimock.com.fasterxml.jackson.</shadedPattern>
+                                        </relocation>
+                                    </relocations>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>io.github.apimock.Main</mainClass>
+                                        </transformer>
+                                    </transformers>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

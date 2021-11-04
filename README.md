@@ -76,30 +76,33 @@ Just see this example to grasp an idea of what you can do:
 
 ```yaml
 responses:
-'200':
+  '200':
     description: successful operation
     content:
-    application/json:
+      application/xml:
         schema:
-        "$ref": "#/components/schemas/Pet"
+          "$ref": "#/components/schemas/Pet"
+      application/json:
+        schema:
+          "$ref": "#/components/schemas/Pet"
         examples:
           pet-1:
             summary: Dynamic Pet
             x-apimock-when: pathParams.petId > 0
             x-apimock-transform:
-                - id: pathParams.petId
-                - category.id: uuid()
-                - $[*].creationDate: 'date("dd/MM/yyy", "-1d")'
+              id: pathParams.petId
+              $[*].creationDate: 'date("dd/MM/yyy", "-1d")'
             value:
+              id: 0
+              name: 'DOG {{Math.random()}}'
+              category:
                 id: 0
-                name: 'DOG {{Math.random()}}'
-                category:
-                    id: 0
-                    name: DOG
-                tags:
-                    - id: 0
-                    name: 'name'
-                status: sold
+                name: DOG
+              photoUrls: []
+              tags:
+                - id: 0
+                  name: 'name'
+              status: sold
 ```
 
 ### Populate karate mocks initial data from OpenAPI examples

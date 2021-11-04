@@ -37,7 +37,6 @@ public class Main implements Callable<Void> {
 
     @CommandLine.Option(names = {"-W", "--watch"}, description = "watch (and hot-reload) mock server file for changes")
     boolean watch;
-    boolean watching = false;
 
     public static void main(String[] args) throws Exception {
         System.setProperty("logback.configurationFile", "logback-apimock.xml");

@@ -191,19 +191,18 @@ paths:
                 "$ref": "#/components/schemas/Pet"
               examples:
                 pet-1:
-                  summary: pet 1
-                  x-apimock-when: pathParams.petId == 1
+                  summary: Dynamic Pet
+                  x-apimock-when: pathParams.petId > 0
                   x-apimock-transform:
-                    id: 'sequenceNext()'
-                    tags[*].date: 'now()'
+                    id: pathParams.petId
+                    creationDate: 'date("dd/MM/yyy", "-1d")'
                   value:
                     id: 0
-                    name: '{{ uuid() }}'
+                    name: 'DOG {{Math.random()}}'
                     category:
-                      id: 1
+                      id: 0
                       name: DOG
-                    photoUrls:
-                      - fill some value
+                    photoUrls: []
                     tags:
                       - id: 0
                         name: 'name'

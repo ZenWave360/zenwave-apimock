@@ -5,13 +5,13 @@ import com.intuit.karate.core.MockHandlerHook;
 import com.intuit.karate.core.ScenarioEngine;
 import com.intuit.karate.http.Request;
 import com.intuit.karate.http.Response;
-import org.openapi4j.core.validation.ValidationResults;
 import org.openapi4j.parser.model.v3.OpenApi3;
 import org.openapi4j.parser.model.v3.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +44,12 @@ public class OpenApiValidatorHook implements MockHandlerHook {
         Operation operation = OpenApiValidator4Karate.findOperation(request.getMethod(), request.getPath(), api);
         if(operation != null) {
             logger.debug("Validating request for operationId {}", operation.getOperationId());
-            ValidationResults validationResults = openApiValidator.isValidRequest(request.getPath(), request.getMethod(), request.getBodyAsString(), OpenApiValidator4Karate.cast(request.getHeaders()), operation.getOperationId());
+            OpenApiValidator4Karate.ValidationResults validationResults = openApiValidator.isValidRequest(request.getPath(), request.getMethod(), request.getBodyAsString(), OpenApiValidator4Karate.cast(request.getHeaders()), operation.getOperationId());
             if (!validationResults.isValid()) {
                 Response response = new Response(400);
                 response.setContentType("application/json");
                 response.setHeader("access-control-allow-origin", "*");
-                response.setBody(toJson(validationResults));
+                response.setBody(toJson("request", validationResults));
                 return response;
             }
         } else {
@@ -64,12 +64,12 @@ public class OpenApiValidatorHook implements MockHandlerHook {
 
         if(operation != null) {
             logger.debug("Validating response for operationId {}", operation.getOperationId());
-            ValidationResults validationResults = openApiValidator.isValidResponse(response.getBodyAsString(), OpenApiValidator4Karate.cast(response.getHeaders()), operation.getOperationId(), response.getStatus());
+            OpenApiValidator4Karate.ValidationResults validationResults = openApiValidator.isValidResponse(response.getBodyAsString(), OpenApiValidator4Karate.cast(response.getHeaders()), operation.getOperationId(), response.getStatus());
             if(!validationResults.isValid()) {
                 response.setStatus(400);
                 response.setContentType("application/json");
                 response.setHeader("access-control-allow-origin", "*");
-                response.setBody(toJson(validationResults));
+                response.setBody(toJson("response", validationResults));
             }
         } else {
             logger.warn("OperationId not found in openapi definition for " + request.getMethod() + " " + request.getPath());
@@ -78,14 +78,17 @@ public class OpenApiValidatorHook implements MockHandlerHook {
         return response;
     }
 
-    public String toJson(ValidationResults validationResults) {
+    public String toJson(String type, OpenApiValidator4Karate.ValidationResults validationResults) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("severity", validationResults.severity().name());
-        List<String> validations = new ArrayList<>();
-        validationResults.items().forEach(item -> {
-            validations.add(String.format("[%s] %s: %s", item.severity().name(), item.dataJsonPointer(), item.toString()));
+        map.put("type", type);
+        Map<String, List<String>> validations = new HashMap<>();
+        validationResults.items.forEach(item -> {
+            if(!validations.containsKey(item.left)) {
+                validations.put(item.left, new ArrayList<>());
+            }
+            validations.get(item.left).add(item.right);
         });
-        map.put("validations", validations);
+        map.put("errors", validations);
         return JsonUtils.toJson(map);
     }
 }

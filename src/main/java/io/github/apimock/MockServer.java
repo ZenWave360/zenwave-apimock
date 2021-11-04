@@ -35,6 +35,7 @@ import karate.com.linecorp.armeria.server.Server;
 import karate.com.linecorp.armeria.server.ServerBuilder;
 
 import java.io.File;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class MockServer extends HttpServer {
 
         @Override
         public Response handle(Request request) {
-            boolean reload = files.entrySet().stream().reduce(false, (modified, entry) -> entry.getKey().lastModified() > entry.getValue(), (a, b) -> a || b);
+            boolean reload = files.entrySet().stream().filter(e -> e.getKey().lastModified() > e.getValue()).collect(Collectors.toList()).size() > 0;
             if(reload) {
                 logger.debug("Reloading MockHandler...");
                 files.entrySet().forEach(e -> e.setValue(e.getKey().lastModified()));

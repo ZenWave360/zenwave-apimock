@@ -65,7 +65,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
             globals.put(NOW, new Variable((Function<String,String>) this::now));
         }
         if(!globals.containsKey(DATE)) {
-            globals.put(DATE, new Variable((BiFunction<String, String,String>) this::date));
+            globals.put(DATE, new Variable((BiFunction<String, String, String>) this::date));
         }
 
         if(api.getComponents() != null && api.getComponents().getExamples() != null) {
@@ -268,7 +268,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
 
     private String date(String format, String intervalExpression) {
         int length = intervalExpression.length();
-        String intervalString = intervalExpression.trim().substring(0, length);
+        String intervalString = intervalExpression.trim().substring(0, length - 1);
         String range = intervalExpression.trim().substring(length);
         int amount = Integer.parseInt(intervalString);
         int field = Calendar.DATE;
