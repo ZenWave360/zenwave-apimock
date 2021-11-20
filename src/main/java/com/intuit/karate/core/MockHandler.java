@@ -34,11 +34,9 @@ import com.intuit.karate.http.Request;
 import com.intuit.karate.http.ResourceType;
 import com.intuit.karate.http.Response;
 import com.intuit.karate.http.ServerHandler;
-import com.intuit.karate.resource.MemoryResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,6 +70,7 @@ public class MockHandler implements ServerHandler {
     private static final String PATH_PARAMS = "pathParams";
     private static final String BODY_PATH = "bodyPath";
 
+    private final List<Feature> featureList;
     private final Map<String, Object> args;
     private final LinkedHashMap<Feature, ScenarioRuntime> features = new LinkedHashMap<>(); // feature + holds global config and vars
     private final Map<String, Variable> globals = new HashMap<>();
@@ -81,11 +80,6 @@ public class MockHandler implements ServerHandler {
     private String prefix = "";
 
     private List<MockHandlerHook> handlerHooks = new ArrayList<>();
-
-    public MockHandler withPrefix(String prefix) {
-        this.prefix = prefix;
-        return this;
-    }
 
     public MockHandler(Feature feature) {
         this(feature, null);
@@ -100,9 +94,37 @@ public class MockHandler implements ServerHandler {
     }
 
     public MockHandler(List<Feature> features, Map<String, Object> args) {
+        this.featureList = features;
         this.args = args;
-        for (Feature feature : features) {
-            ScenarioRuntime runtime = createScenarioRuntime(feature, args);
+    }
+
+    public MockHandler withPrefix(String prefix) {
+        this.prefix = prefix;
+        return this;
+    }
+
+    public MockHandler withHandlerHooks(List<MockHandlerHook> handlerHooks) {
+        this.handlerHooks = handlerHooks;
+        return this;
+    }
+
+    public MockHandler start() {
+        reload();
+        return this;
+    }
+
+    public void reload() {
+        for (MockHandlerHook hook : handlerHooks) {
+            hook.reload();
+        }
+        this.featureList.replaceAll(feature -> Feature.read(feature.getResource().getFile()));
+        for (Feature feature : featureList) {
+            FeatureRuntime featureRuntime = FeatureRuntime.of(Suite.forTempUse(), feature, args);
+            FeatureSection section = new FeatureSection();
+            section.setIndex(-1); // TODO util for creating dummy scenario
+            Scenario dummy = new Scenario(feature, section, -1);
+            section.setScenario(dummy);
+            ScenarioRuntime runtime = new ScenarioRuntime(featureRuntime, dummy);
             initRuntime(runtime);
             if (feature.isBackgroundPresent()) {
                 // if we are within a scenario already e.g. karate.start(), preserve context
@@ -126,16 +148,9 @@ public class MockHandler implements ServerHandler {
             runtime.logger.info("mock server initialized: {}", feature);
             this.features.put(feature, runtime);
         }
-    }
-
-    private ScenarioRuntime createScenarioRuntime(Feature feature, Map<String, Object> args) {
-        FeatureRuntime featureRuntime = FeatureRuntime.of(Suite.forTempUse(), feature, args);
-        FeatureSection section = new FeatureSection();
-        section.setIndex(-1); // TODO util for creating dummy scenario
-        Scenario dummy = new Scenario(feature, section, -1);
-        section.setScenario(dummy);
-        ScenarioRuntime runtime = new ScenarioRuntime(featureRuntime, dummy);
-        return runtime;
+        for (MockHandlerHook hook : handlerHooks) {
+            hook.onSetup(features, globals);
+        }
     }
 
     private void initRuntime(ScenarioRuntime runtime) {
@@ -245,12 +260,12 @@ public class MockHandler implements ServerHandler {
                     }
                     if(result.isFailed()) {
                         for (MockHandlerHook hook : this.handlerHooks) {
-                            logger.info("Returning response on 'afterScenarioFailure' from hook: {}", hook);
+                            logger.trace("Running 'afterScenarioFailure' from hook: {}", hook);
                             res = hook.afterScenarioFailure(req, res, engine);
                         }
                     } else {
                         for (MockHandlerHook hook : this.handlerHooks) {
-                            logger.info("Returning response on 'afterScenarioSuccess' from hook: {}", hook);
+                            logger.trace("Running 'afterScenarioSuccess' from hook: {}", hook);
                             res = hook.afterScenarioSuccess(req, res, engine);
                         }
                     }
@@ -261,7 +276,7 @@ public class MockHandler implements ServerHandler {
         Response res = new Response(404);
         for (MockHandlerHook hook : this.handlerHooks) {
             logger.info("Returning response on 'noMatchingScenario' from hook: {}", hook);
-            ScenarioRuntime runtime = createScenarioRuntime(features.keySet().stream().findFirst().get(), args);
+            ScenarioRuntime runtime = features.values().stream().findFirst().get();
             res = hook.noMatchingScenario(req, res, createScenarioEngine(req, runtime));
         }
         logger.warn("no scenarios matched, returning 404: {}", req); // NOTE: not logging with engine.logger
@@ -308,14 +323,14 @@ public class MockHandler implements ServerHandler {
         try {
             Variable v = engine.evalJs(expression);
             if (v.isTrue()) {
-                engine.logger.debug("scenario matched at line {}: {}", scenario.getLine(), expression);
+                engine.logger.debug("scenario matched at {} line {}: {}", scenario.getFeature().getResource().getFile(), scenario.getLine(), expression);
                 return true;
             } else {
-                engine.logger.trace("scenario skipped at line {}: {}", scenario.getLine(), expression);
+                engine.logger.trace("scenario skipped at {} line {}: {}", scenario.getFeature().getResource().getFile(), scenario.getLine(), expression);
                 return false;
             }
         } catch (Exception e) {
-            engine.logger.warn("scenario match evaluation failed at line {}: {} - {}", scenario.getLine(), expression, e + "");
+            engine.logger.warn("scenario match evaluation failed at {} line {}: {} - {}", scenario.getFeature().getResource().getFile(), scenario.getLine(), expression, e + "");
             return false;
         }
     }

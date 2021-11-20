@@ -5,8 +5,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.apimocks</groupId>
-    <artifactId>apimocks</artifactId>
+    <groupId>io.github.apimock</groupId>
+    <artifactId>apimock</artifactId>
     <version>0.0.1</version>
 	<packaging>jar</packaging>
 
@@ -16,7 +16,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <karate.version>1.2.0.RC1</karate.version>
-        <armeria.version>1.8.0</armeria.version>
+        <armeria.version>1.12.0</armeria.version>
         <openapi4j.version>1.0.7</openapi4j.version>
     </properties>
 
@@ -29,10 +29,46 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.github.apimocks.MockMain</mainClass>
+                            <mainClass>io.github.apimock.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>com.intuit.karate:*</exclude>
+                                    <exclude>com.linecorp.armeria</exclude>
+                                    <exclude>org.graalvm.js:*</exclude>
+                                    <exclude>org.graalvm.sdk:graal-sdk</exclude>
+                                    <exclude>org.graalvm.js</exclude>
+                                    <exclude>org.graalvm.regex:regex</exclude>
+                                    <exclude>org.graalvm.truffle:truffle-api</exclude>
+                                    <exclude>com.ibm.icu:icu4j</exclude>
+                                    <exclude>ch.qos.logback</exclude>
+                                    <exclude>org.slf4j:*</exclude>
+                                    <exclude>com.jayway.jsonpath:json-path</exclude>
+                                    <exclude>net.minidev:*</exclude>
+                                    <exclude>org.ow2.asm:asm</exclude>
+                                    <exclude>info.cukes:*</exclude>
+                                    <exclude>org.yaml:snakeyaml</exclude>
+                                    <exclude>de.siegmar:fastcsv</exclude>
+                                    <exclude>info.picocli:picocli</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -52,6 +88,13 @@
             <groupId>com.linecorp.armeria</groupId>
             <artifactId>armeria</artifactId>
             <version>${armeria.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
      </dependencies>
 </project>

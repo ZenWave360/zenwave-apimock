@@ -3,7 +3,15 @@ package com.intuit.karate.core;
 import com.intuit.karate.http.Request;
 import com.intuit.karate.http.Response;
 
+import java.util.Map;
+
 public interface MockHandlerHook {
+
+    default void reload() {
+    }
+
+    default void onSetup(Map<Feature, ScenarioRuntime> features, Map<String, Variable> globals) {
+    }
 
     default Response beforeRequest(Request req) {
         return null;

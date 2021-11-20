@@ -8,7 +8,8 @@
     </appender> 
    
     <logger name="com.intuit.karate" level="DEBUG"/>
-    <logger name="io.github.apimocks" level="DEBUG"/>
+    <logger name="io.github.apimock" level="DEBUG"/>
+    <logger name="com.linecorp.armeria.server.HttpServerHandler" level="ERROR"/>
    
     <root level="warn">
         <appender-ref ref="STDOUT" />
