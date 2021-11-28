@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ *
+ *  @author ivangsa
+ */
 public abstract class MockServerBuilder {
     File openapi;
     List<Feature> features = Arrays.asList(Feature.read("classpath:io/github/apimock/default.feature"));
@@ -33,6 +37,9 @@ public abstract class MockServerBuilder {
     List<MockHandlerHook> hooks = new ArrayList<>();
 
     public MockServerBuilder openapi(File openapi) throws MalformedURLException {
+        if(openapi == null) { // used in Main
+            return this;
+        }
         this.openapi = openapi;
         OpenApiValidator4Karate openApiValidator = OpenApiValidator4Karate.fromURL(this.openapi.toURI().toURL());
         return this.openapi(openApiValidator);
@@ -52,8 +59,8 @@ public abstract class MockServerBuilder {
     }
 
     public MockServerBuilder openapi(OpenApiValidator4Karate openApiValidator) {
-        withHook(new OpenApiValidatorHook(openApiValidator));
         withHook(new OpenApiExamplesHook(openApiValidator));
+        withHook(new OpenApiValidatorHook(openApiValidator));
         return this;
     }
 
@@ -63,6 +70,10 @@ public abstract class MockServerBuilder {
     }
 
     public MockServerBuilder features(List<File> features) {
+        if(features == null) { // used in Main
+            return this;
+        }
+
         this.features = features.stream().map(f -> Feature.read(f)).collect(Collectors.toList());
         return this;
     }

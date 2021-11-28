@@ -16,6 +16,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ *  @author ivangsa
+ */
 public class OpenApiValidatorHook implements MockHandlerHook {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -39,7 +43,7 @@ public class OpenApiValidatorHook implements MockHandlerHook {
     public Response beforeRequest(Request request) {
         Operation operation = OpenApiValidator4Karate.findOperation(request.getMethod(), request.getPath(), api);
         if(operation != null) {
-            logger.debug("Validating response for operationId {}", operation.getOperationId());
+            logger.debug("Validating request for operationId {}", operation.getOperationId());
             ValidationResults validationResults = openApiValidator.isValidRequest(request.getPath(), request.getMethod(), request.getBodyAsString(), OpenApiValidator4Karate.cast(request.getHeaders()), operation.getOperationId());
             if (!validationResults.isValid()) {
                 Response response = new Response(400);
@@ -48,6 +52,8 @@ public class OpenApiValidatorHook implements MockHandlerHook {
                 response.setBody(toJson(validationResults));
                 return response;
             }
+        } else {
+            logger.warn("OperationId not found in openapi definition for " + request.getMethod() + " " + request.getPath());
         }
         return null;
     }

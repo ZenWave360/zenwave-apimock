@@ -32,11 +32,18 @@ import net.minidev.json.JSONObject;
 import org.openapi4j.parser.model.v3.Server;
 import org.openapi4j.schema.validator.ValidationContext;
 import org.openapi4j.schema.validator.v3.ValidationOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.openapi4j.core.validation.ValidationSeverity.ERROR;
 
+/**
+ *
+ *  @author ivangsa
+ */
 public class OpenApiValidator4Karate {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private OpenApi3 api;
 
@@ -90,6 +97,7 @@ public class OpenApiValidator4Karate {
 
     public void reload() {
         URL url = (URL) this.api.getExtensions().get("x-apimock-internal-url");
+        logger.debug("Loading {} from {}", this.getClass().getSimpleName(), url);
         if(url != null) {
             OpenApiValidator4Karate reloaded = fromURL(url);
             this.api = reloaded.api;
