@@ -1,6 +1,9 @@
 package io.github.apimock;
 
 
+import com.intuit.karate.StringUtils;
+import com.intuit.karate.resource.ResourceUtils;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -19,6 +22,8 @@ import java.util.concurrent.Callable;
  * @author ivangsa
  */
 public class Main implements Callable<Void> {
+
+    private static final String LOGBACK_CONFIG = "logback.configurationFile";
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
     boolean help;
@@ -39,7 +44,18 @@ public class Main implements Callable<Void> {
     boolean watch;
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("logback.configurationFile", "logback-apimock.xml");
+        String logbackConfig = System.getProperty(LOGBACK_CONFIG);
+        if (StringUtils.isBlank(logbackConfig)) {
+            File logbackXml = ResourceUtils.classPathOrFile("logback.xml");
+            File logbackTest = ResourceUtils.classPathOrFile("logback-test.xml");
+            if (logbackTest != null) {
+                System.setProperty(LOGBACK_CONFIG, "logback-test.xml");
+            } else if (logbackXml != null) {
+                System.setProperty(LOGBACK_CONFIG, "logback.xml");
+            } else {
+                System.setProperty(LOGBACK_CONFIG, "logback-apimock.xml");
+            }
+        }
         CommandLine cmd = new CommandLine(new Main());
         int returnCode = cmd.execute(args);
         Thread.currentThread().join();

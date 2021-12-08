@@ -204,7 +204,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
         while (matcher.find()) {
             String match = matcher.group(0);
             String script = matcher.group(1);
-            logger.debug("Processing replacement for generator script: {}", script);
+            logger.trace("Processing inline replacement for script: {}", script);
             String replacement = evalJsAsString(engine, script);
             if(replacement != null) {
                 jsonString = jsonString.replace(match, replacement);
