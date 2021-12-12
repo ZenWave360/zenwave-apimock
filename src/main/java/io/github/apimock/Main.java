@@ -3,10 +3,12 @@ package io.github.apimock;
 
 import com.intuit.karate.StringUtils;
 import com.intuit.karate.resource.ResourceUtils;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -56,6 +58,8 @@ public class Main implements Callable<Void> {
                 System.setProperty(LOGBACK_CONFIG, "logback-apimock.xml");
             }
         }
+        resetLoggerConfig();
+
         CommandLine cmd = new CommandLine(new Main());
         int returnCode = cmd.execute(args);
         Thread.currentThread().join();
@@ -92,6 +96,20 @@ public class Main implements Callable<Void> {
             return true;
         } catch (ClassNotFoundException e) {
             return false;
+        }
+    }
+
+    private static void resetLoggerConfig() {
+        ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+        try {
+            Method reset = factory.getClass().getDeclaredMethod("reset");
+            reset.invoke(factory);
+            Class clazz = Class.forName("ch.qos.logback.classic.util.ContextInitializer");
+            Object temp = clazz.getDeclaredConstructors()[0].newInstance(factory);
+            Method autoConfig = clazz.getDeclaredMethod("autoConfig");
+            autoConfig.invoke(temp);
+        } catch (Exception e) {
+            // ignore
         }
     }
 }
