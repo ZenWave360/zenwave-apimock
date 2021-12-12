@@ -1,6 +1,7 @@
 package io.github.apimock;
 
 import com.intuit.karate.Json;
+import com.intuit.karate.JsonUtils;
 import com.intuit.karate.core.Feature;
 import com.intuit.karate.core.MockHandlerHook;
 import com.intuit.karate.core.ScenarioEngine;
@@ -210,7 +211,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
                 jsonString = jsonString.replace(match, replacement);
             }
         }
-        return jsonString;
+        return JsonUtils.toStrictJson(jsonString);
     }
 
     private void loadPathParams(String uri, String pattern, ScenarioEngine engine) {
