@@ -8,7 +8,7 @@ Where OpenAPI meets KarateDSL Server Side Features for REST API mocking:
 - Flexible and powerful built-in and custom defined **dynamic data generators** for your OpenAPI examples with `x-apimock-transform`.
 - Use openapi examples to **populate your karate mocks** initial data with `x-apimock-karate-var` and `x-apimock-seed`.
 
-Checkout [KarateIDE vscode extension](https://github.com/ivangsa/karate-ide) for a powerful testing and mocking user experience for KarateDSL.
+Checkout [KarateIDE vscode extension](https://github.com/ZenWave360/karate-ide) for a powerful testing and mocking user experience for KarateDSL.
 
 <!-- TOC -->
 
@@ -167,9 +167,9 @@ Scenario: methodIs('post') && pathMatches('/pet')
 
 Checkout this complete CRUD Example
 
-- [OpenAPI definition with examples data](https://github.com/ivangsa/apimocks/blob/main/src/test/resources/petstore/petstore-openapi.yml#L360)
-- [Complete Karate PetMock](https://github.com/ivangsa/apimocks/blob/main/src/test/resources/petstore/mocks/PetMock/PetMock.feature)
-- [JUnit CRUD test using an OpenAPI client](https://github.com/ivangsa/apimocks/blob/main/src/test/java/io/github/apimock/RestClientExampleTest.java)
+- [OpenAPI definition with examples data](https://github.com/ZenWave360/apimock/blob/main/src/test/resources/petstore/petstore-openapi.yml#L360)
+- [Complete Karate PetMock](https://github.com/ZenWave360/apimock/blob/main/src/test/resources/petstore/mocks/PetMock/PetMock.feature)
+- [JUnit CRUD test using an OpenAPI client](https://github.com/ZenWave360/apimock/blob/main/src/test/java/io/github/apimock/RestClientExampleTest.java)
 
 
 ## Usage
@@ -177,7 +177,7 @@ Checkout this complete CRUD Example
 ### Build from source
 
 ```shell
-git clone https://github.com/ivangsa/apimock.git
+git clone https://github.com/ZenWave360/apimock.git
 cd apimock
 mvn clean install
 ```
@@ -186,7 +186,7 @@ mvn clean install
 
 ```xml
 <dependency>
-  <groupId>io.github.apimock</groupId>
+  <groupId>io.github.zenwave360</groupId>
   <artifactId>apimock</artifactId>
   <version>0.0.1</version>
 </dependency>
