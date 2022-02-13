@@ -182,21 +182,13 @@ Checkout this complete CRUD Example
 
 ## Usage
 
-### Build from source
-
-```shell
-git clone https://github.com/ZenWave360/apimock.git
-cd apimock
-mvn clean install
-```
-
 ### Maven dependency
 
 ```xml
 <dependency>
   <groupId>io.github.zenwave360</groupId>
   <artifactId>apimock</artifactId>
-  <version>0.0.1</version>
+  <version>${apimock.version}</version>
 </dependency>
 ```
 
