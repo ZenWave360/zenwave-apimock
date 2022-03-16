@@ -25,10 +25,12 @@ package com.intuit.karate.core;
 
 import com.intuit.karate.Json;
 import com.intuit.karate.KarateException;
+import com.intuit.karate.Runner;
 import com.intuit.karate.ScenarioActions;
 import com.intuit.karate.StringUtils;
 import com.intuit.karate.Suite;
 import com.intuit.karate.graal.JsValue;
+import com.intuit.karate.http.HttpClientFactory;
 import com.intuit.karate.http.HttpUtils;
 import com.intuit.karate.http.Request;
 import com.intuit.karate.http.ResourceType;
@@ -37,6 +39,7 @@ import com.intuit.karate.http.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -113,13 +116,26 @@ public class MockHandler implements ServerHandler {
         return this;
     }
 
+    private static Suite forTempUse(HttpClientFactory hcf) {
+        try {
+            return Suite.forTempUse(hcf);
+        } catch (Throwable e) {
+            try {
+                return (Suite) Suite.class.getMethod("forTempUse").invoke(null);
+            } catch (Exception ex) {
+                logger.error("Unknown version of karate, couldn't find Suite.forTempUse() method");
+                throw new RuntimeException("Unknown version of karate, couldn't find Suite.forTempUse() method", ex);
+            }
+        }
+    }
+
     public void reload() {
         for (MockHandlerHook hook : handlerHooks) {
             hook.reload();
         }
         this.featureList.replaceAll(feature -> Feature.read(feature.getResource().getFile()));
         for (Feature feature : featureList) {
-            FeatureRuntime featureRuntime = FeatureRuntime.of(Suite.forTempUse(), feature, args);
+            FeatureRuntime featureRuntime = FeatureRuntime.of(forTempUse(HttpClientFactory.DEFAULT), feature, args);
             FeatureSection section = new FeatureSection();
             section.setIndex(-1); // TODO util for creating dummy scenario
             Scenario dummy = new Scenario(feature, section, -1);
@@ -183,7 +199,8 @@ public class MockHandler implements ServerHandler {
         }
         String path = req.getPath();
         if (!path.isEmpty()) {
-            req.setPath(path.substring(prefix.length()));
+            int pathSlashOffset = path.startsWith("/")? 1 : 0;
+            req.setPath(path.substring(prefix.length() + pathSlashOffset));
         }
         for (MockHandlerHook hook : this.handlerHooks) {
             Response response = hook.beforeRequest(req);

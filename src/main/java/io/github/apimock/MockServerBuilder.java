@@ -1,15 +1,7 @@
 package io.github.apimock;
 
 import com.intuit.karate.core.Feature;
-import com.intuit.karate.core.MockHandler;
 import com.intuit.karate.core.MockHandlerHook;
-import com.intuit.karate.http.HttpServer;
-import com.intuit.karate.http.HttpServerHandler;
-import com.intuit.karate.http.ServerHandler;
-import com.intuit.karate.http.SslContextFactory;
-import karate.com.linecorp.armeria.server.HttpService;
-import karate.com.linecorp.armeria.server.Server;
-import karate.com.linecorp.armeria.server.ServerBuilder;
 
 import java.io.File;
 import java.net.MalformedURLException;

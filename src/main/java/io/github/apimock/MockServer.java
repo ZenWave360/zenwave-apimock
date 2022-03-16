@@ -30,9 +30,9 @@ import com.intuit.karate.http.Request;
 import com.intuit.karate.http.Response;
 import com.intuit.karate.http.ServerHandler;
 import com.intuit.karate.http.SslContextFactory;
-import karate.com.linecorp.armeria.server.HttpService;
-import karate.com.linecorp.armeria.server.Server;
-import karate.com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.HttpService;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
 
 import java.io.File;
 import java.util.Date;

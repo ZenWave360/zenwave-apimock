@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <karate.version>1.2.0.RC1</karate.version>
+        <karate.version>1.2.0.RC5</karate.version>
         <armeria.version>1.13.4</armeria.version>
         <openapi4j.version>1.0.7</openapi4j.version>
     </properties>
@@ -325,6 +325,15 @@
                                             <exclude>org.yaml:snakeyaml</exclude>
                                             <exclude>de.siegmar:fastcsv</exclude>
                                             <exclude>info.picocli:picocli</exclude>
+                                            <exclude>org.thymeleaf:*</exclude>
+                                            <exclude>ognl:*</exclude>
+                                            <exclude>org.javassist:*</exclude>
+                                            <exclude>org.attoparser:*</exclude>
+                                            <exclude>org.unbescape:*</exclude>
+                                            <exclude>io.github.classgraph:*</exclude>
+                                            <exclude>org.apache.httpcomponents:*</exclude>
+                                            <exclude>org.antlr:*</exclude>
+                                            <exclude>commons-codec:*</exclude>
                                         </excludes>
                                     </artifactSet>
                                     <relocations>

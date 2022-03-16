@@ -71,32 +71,15 @@ public class Main implements Callable<Void> {
             CommandLine.usage(this, System.err);
             return null;
         }
-        if(isKarateShadowedJar()) {
-            MockServer server = MockServer.builder()
-                    .openapi(openapi)
-                    .features(mock)
-                    .pathPrefix(contextPath)
-                    .watch(watch)
-                    .http(port).build();
-        } else {
-            MockServerWithArmeria server = MockServerWithArmeria.builder()
-                    .openapi(openapi)
-                    .features(mock)
-                    .pathPrefix(contextPath)
-                    .watch(watch)
-                    .http(port).build();
-        }
+
+        MockServer server = MockServer.builder()
+                .openapi(openapi)
+                .features(mock)
+                .pathPrefix(contextPath)
+                .watch(watch)
+                .http(port).build();
         // server.waitSync();
         return null;
-    }
-
-    private boolean isKarateShadowedJar() {
-        try {
-            Class.forName("karate.com.linecorp.armeria.server.HttpService");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 
     private static void resetLoggerConfig() {
