@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -154,21 +155,6 @@ public class OpenApiExamplesHook implements MockHandlerHook {
     }
 
     @Override
-    public Response afterScenarioSuccess(Request req, Response response, ScenarioEngine engine) {
-        logger.debug("Processing karate response for dynamic properties");
-//        Operation operation = OpenApiValidator4Karate.findOperation(req.getMethod(), req.getPath(), api);
-//        Map.Entry<String, org.openapi4j.parser.model.v3.Response> oasResponseEntry = operation.getResponses().entrySet().stream()
-//                .filter(e -> e.getKey().equals(String.valueOf(response.getStatus())) || e.getKey().equals(String.valueOf(response.getStatus() % 100) + "XX"))
-//                .findFirst().orElse(null);
-//
-//        Map<String, Object> extensions = oasResponseEntry != null? oasResponseEntry.getValue().getExtensions() : null;
-//        Map<String, String> transformers = extensions != null? (Map) extensions.get("x-apimock-transform") : null;
-        response.setBody(processObjectDynamicProperties(engine, null, response.getBodyAsString()));
-
-        return response;
-    }
-
-    @Override
     public Response noMatchingScenario(Request req, Response response, ScenarioEngine engine) {
 
         Operation operation = OpenApiValidator4Karate.findOperation(req.getMethod(), req.getPath(), api);
@@ -178,15 +164,27 @@ public class OpenApiExamplesHook implements MockHandlerHook {
         }
         logger.debug("Searching examples in openapi definition for operationId {}", operation.getOperationId());
         Map<String, org.openapi4j.parser.model.v3.Response> responses = OpenApiValidator4Karate.find2xxResponses(operation);
+        loadPathParams(req.getPath(), (String) operation.getExtensions().get("x-apimock-internal-path"), engine);
+
         if(!responses.isEmpty()) {
             String status = responses.keySet().stream().findFirst().get();
             org.openapi4j.parser.model.v3.Response oasRespose = responses.get(status);
             // match media type from request
             String contentType = getContentType(req);
-            Map.Entry<String, MediaType> mediaTypeEntry = oasRespose.getContentMediaTypes().entrySet().stream().filter(e -> e.getKey().startsWith(contentType)).findFirst().orElse(null);
-            if(mediaTypeEntry == null || mediaTypeEntry.getValue().getExamples() == null) {
+            Map.Entry<String, MediaType> mediaTypeEntry = oasRespose.getContentMediaTypes().entrySet().stream()
+                    .filter(e -> e.getKey().startsWith(contentType))
+                    .findFirst().orElse(new AbstractMap.SimpleEntry("", new MediaType()));
+
+            if(mediaTypeEntry.getValue().getExamples() == null && mediaTypeEntry.getValue().getExample() != null) {
+                logger.debug("Returning default example in openapi for operationId {}", operation.getOperationId());
+                response = new Response(Integer.valueOf(status.toLowerCase().replaceAll("x", "0")));
+                response.setBody(processObjectDynamicProperties(engine, null, mediaTypeEntry.getValue().getExample()));
+                response.setContentType(mediaTypeEntry.getKey());
+                response.setHeader("access-control-allow-origin", "*");
+                unloadPathParams(engine);
                 return response;
             }
+
             for (Map.Entry<String, Example> exampleEntry: mediaTypeEntry.getValue().getExamples().entrySet()) {
                 Map<String, Object> extensions = exampleEntry.getValue().getExtensions();
                 if(extensions == null) {
@@ -195,21 +193,21 @@ public class OpenApiExamplesHook implements MockHandlerHook {
                 Object when = extensions.get("x-apimock-when");
                 Map<String, String> generators = (Map<String, String>) extensions.get("x-apimock-transform");
                 if(when != null) {
-                    loadPathParams(req.getPath(), (String) operation.getExtensions().get("x-apimock-internal-path"), engine);
                     if(evalBooleanJs(engine, when.toString())) {
-                        logger.debug("Found example named {} for x-apimock-when {} in openapi for operationId {}", exampleEntry.getKey(), when, operation.getOperationId());
+                        logger.debug("Found example[{}] for x-apimock-when {} in openapi for operationId {}", exampleEntry.getKey(), when, operation.getOperationId());
                         Example example = exampleEntry.getValue();
                         logger.debug("Returning example in openapi for operationId {}", operation.getOperationId());
                         response = new Response(Integer.valueOf(status.toLowerCase().replaceAll("x", "0")));
                         response.setBody(processObjectDynamicProperties(engine, generators, example.getValue()));
                         response.setContentType(mediaTypeEntry.getKey());
                         response.setHeader("access-control-allow-origin", "*");
+                        break;
                     }
-                    unloadPathParams(engine);
                 }
             }
         }
 
+        unloadPathParams(engine);
         return response;
     }
 
@@ -342,14 +340,6 @@ public class OpenApiExamplesHook implements MockHandlerHook {
 
     private boolean isNotEmpty(String str) {
         return str != null && !str.trim().equals("");
-    }
-
-    private Integer asInteger(Object obj) {
-        try{
-            return Integer.parseInt(obj.toString());
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private static final String UUID = "uuid";
