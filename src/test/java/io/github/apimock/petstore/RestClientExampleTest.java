@@ -1,5 +1,6 @@
-package io.github.apimock;
+package io.github.apimock.petstore;
 
+import io.github.apimock.MockServer;
 import io.github.apimock.petstore.client.api.PetApi;
 import io.github.apimock.petstore.client.model.CategoryDto;
 import io.github.apimock.petstore.client.model.PetDto;

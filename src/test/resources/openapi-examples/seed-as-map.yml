@@ -1,0 +1,18 @@
+paths: {}
+components:
+  examples:
+
+    example1:
+      x-apimock-karate-var: variable
+      x-apimock-seed:
+        data: 10
+      value:
+        page: 1
+        size: 10
+        data:
+          - id: 1
+            name: "name"
+            description: "description"
+            createdAt: "2020-01-01T00:00:00.000Z"
+            updatedAt: "2020-01-01T00:00:00.000Z"
+            deletedAt: null

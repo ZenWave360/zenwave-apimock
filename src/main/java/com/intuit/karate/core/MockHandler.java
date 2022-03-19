@@ -25,7 +25,6 @@ package com.intuit.karate.core;
 
 import com.intuit.karate.Json;
 import com.intuit.karate.KarateException;
-import com.intuit.karate.Runner;
 import com.intuit.karate.ScenarioActions;
 import com.intuit.karate.StringUtils;
 import com.intuit.karate.Suite;
@@ -39,7 +38,6 @@ import com.intuit.karate.http.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -136,10 +134,7 @@ public class MockHandler implements ServerHandler {
         this.featureList.replaceAll(feature -> Feature.read(feature.getResource().getFile()));
         for (Feature feature : featureList) {
             FeatureRuntime featureRuntime = FeatureRuntime.of(forTempUse(HttpClientFactory.DEFAULT), feature, args);
-            FeatureSection section = new FeatureSection();
-            section.setIndex(-1); // TODO util for creating dummy scenario
-            Scenario dummy = new Scenario(feature, section, -1);
-            section.setScenario(dummy);
+            Scenario dummy = createDummyScenario(feature);
             ScenarioRuntime runtime = new ScenarioRuntime(featureRuntime, dummy);
             initRuntime(runtime);
             if (feature.isBackgroundPresent()) {
@@ -167,6 +162,14 @@ public class MockHandler implements ServerHandler {
         for (MockHandlerHook hook : handlerHooks) {
             hook.onSetup(features, globals);
         }
+    }
+
+    public static Scenario createDummyScenario(Feature feature) {
+        FeatureSection section = new FeatureSection();
+        section.setIndex(-1);
+        Scenario dummy = new Scenario(feature, section, -1);
+        section.setScenario(dummy);
+        return dummy;
     }
 
     private void initRuntime(ScenarioRuntime runtime) {

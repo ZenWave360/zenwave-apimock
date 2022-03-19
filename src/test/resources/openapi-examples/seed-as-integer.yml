@@ -1,0 +1,7 @@
+paths: {}
+components:
+  examples:
+    example1:
+      x-apimock-seed: 10
+      x-apimock-karate-var: variable
+      value: "a string"

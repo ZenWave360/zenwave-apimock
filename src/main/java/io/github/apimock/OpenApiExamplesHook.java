@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -74,33 +75,80 @@ public class OpenApiExamplesHook implements MockHandlerHook {
             engine.init();
             for (Example example : api.getComponents().getExamples().values()) {
                 String karateVar = (String) firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-karate-var");
-                Map<String, String> transforms = (Map) firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-transform");
-                Integer seed = firstNotNull(asInteger(firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-seed")), 1);
-                try {
-                    if(isNotEmpty(karateVar)) {
-                        for (int i = 0; i < seed; i++) {
-                            String json = processObjectDynamicProperties(engine, transforms, example.getValue());
-                            Variable examplesVariable = new Variable(Json.of(json).value());
-                            if(!globals.containsKey(karateVar)) {
-                                globals.put(karateVar, examplesVariable);
-                            } else {
-                                Variable karateVariable = globals.get(karateVar);
-                                if(karateVariable.isList()) {
-                                    if(examplesVariable.isList()) {
-                                        ((List)karateVariable.getValue()).addAll(examplesVariable.getValue());
-                                    } else {
-                                        ((List)karateVariable.getValue()).add(examplesVariable.getValue());
-                                    }
-                                }
-                                if(karateVariable.isMap() && examplesVariable.isMap()) {
-                                    ((Map)karateVariable.getValue()).putAll(examplesVariable.getValue());
-                                }
-                            }
-                        }
+                if(isNotEmpty(karateVar)) {
+                    Object seeds = firstNotNull(firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-seed"), 1);
+                    Map<String, Object> seedsMap = seeds instanceof Integer? defaultRootSeed((Integer) seeds): (Map<String, Object>) seeds;
+                    Object seededExample = seed(example.getValue(), seedsMap);
+
+                    try {
+                        Map<String, String> transforms = (Map) firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-transform");
+                        String json = processObjectDynamicProperties(engine, transforms, seededExample);
+                        Variable exampleVariable = new Variable(Json.of(json).value());
+                        addExamplesVariableToKarateGlobals(globals, karateVar, exampleVariable);
+                    } catch (Exception e) {
+                        logger.error("Error setting openapi examples {} into karate globals ({})", karateVar, e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    logger.error("Error setting openapi examples {} into karate globals ({})", karateVar, e.getMessage(), e);
                 }
+            }
+        }
+    }
+
+    private Map<String, Object> defaultRootSeed(Integer seed) {
+        Map<String, Object> seedMap = new HashMap<>();
+        seedMap.put("$", seed);
+        return seedMap;
+    }
+
+    private Object seed(Object value, Map<String, Object> seedsMap) {
+        Json json = Json.of(value);
+        for (Map.Entry<String, Object> seedEntry : seedsMap.entrySet()) {
+            int seed = (Integer) seedEntry.getValue();
+            if(seed == 1) {
+                continue;
+            }
+            String seedPath = String.valueOf(seedEntry.getKey());
+            Object inner = json.get(seedPath);
+            Object seeded = seedValue(inner, seed);
+            json = replace(json, seedPath, seeded);
+        }
+        return json.get("$");
+    }
+
+
+    private List seedValue(Object value, int seed) {
+        List seeded = new ArrayList();
+        for (int i = 0; i < seed; i++) {
+            if(value instanceof List) {
+                seeded.addAll((List) JsonUtils.deepCopy(value));
+            } else {
+                seeded.add(JsonUtils.deepCopy(value));
+            }
+        }
+        return seeded;
+    }
+
+    private Json replace(Json json, String path, Object replacement) {
+        if("$".equals(path)) {
+            return Json.of(replacement);
+        }
+        json.set(path, replacement);
+        return json;
+    }
+
+    private void addExamplesVariableToKarateGlobals(Map<String, Variable> globals, String karateVar, Variable examplesVariable) {
+        if(!globals.containsKey(karateVar)) {
+            globals.put(karateVar, examplesVariable);
+        } else {
+            Variable karateVariable = globals.get(karateVar);
+            if(karateVariable.isList()) {
+                if(examplesVariable.isList()) {
+                    ((List)karateVariable.getValue()).addAll(examplesVariable.getValue());
+                } else {
+                    ((List)karateVariable.getValue()).add(examplesVariable.getValue());
+                }
+            }
+            if(karateVariable.isMap() && examplesVariable.isMap()) {
+                ((Map)karateVariable.getValue()).putAll(examplesVariable.getValue());
             }
         }
     }

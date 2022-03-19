@@ -56,6 +56,9 @@ public class OpenApiValidator4Karate {
     public OpenApiValidator4Karate(final OpenApi3 api) {
         super();
         this.api = api;
+        if(this.api.getServers() == null) {
+            this.api.setServers(new ArrayList<>());
+        }
         this.api.getServers().add(new Server().setUrl("http://localhost")); //validate also without contextPath
         ValidationContext vdc = new ValidationContext<>(api.getContext());
         vdc.setOption(ValidationOptions.ADDITIONAL_PROPS_RESTRICT, true);

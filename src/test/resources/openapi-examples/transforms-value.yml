@@ -1,0 +1,16 @@
+paths: {}
+components:
+  examples:
+    example1:
+      x-apimock-karate-var: variable
+      x-apimock-transform:
+        id: sequenceNext() + 1
+        status: "Math.random() >= 0.5? 'sold' : 'available'"
+      value:
+        id: 0
+        name: 'Dog Name {{Math.random()}}'
+        category:
+          id: 1
+          name: DOG
+        photoUrls: []
+        status: before-transform
