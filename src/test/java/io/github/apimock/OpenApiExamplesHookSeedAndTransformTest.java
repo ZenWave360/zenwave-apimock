@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OpenApiExamplesHookTest {
+public class OpenApiExamplesHookSeedAndTransformTest {
 
     Map<Feature, ScenarioRuntime> createTestFeatureScenarioRuntimeMap() {
         Feature feature = Feature.read("classpath:io/github/apimock/default.feature");

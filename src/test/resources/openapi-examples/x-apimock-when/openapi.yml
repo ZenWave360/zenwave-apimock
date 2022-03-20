@@ -1,0 +1,88 @@
+---
+openapi: 3.0.2
+paths:
+  "/pet/{petId}":
+    get:
+      tags:
+      - pet
+      summary: Find pet by ID
+      description: Returns a single pet
+      operationId: getPetById
+      parameters:
+      - name: petId
+        in: path
+        description: ID of pet to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: flag
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Pet"
+              examples:
+                pet-1:
+                  summary: Dynamic Pet
+                  x-apimock-when: paramValue('flag') == 1
+                  x-apimock-transform:
+                    id: pathParams.petId
+                    creationDate: 'date("dd/MM/yyy", "-1d")'
+                  value:
+                    id: 0
+                    name: 'dog 1 from openapi-x-apimock-when'
+                    status: sold
+                pet-2:
+                  summary: Dynamic Pet
+                  x-apimock-when: paramValue('flag') == 2
+                  x-apimock-transform:
+                    id: pathParams.petId
+                    creationDate: 'date("dd/MM/yyy", "-1d")'
+                  value:
+                    id: 0
+                    name: 'dog 2 from openapi-x-apimock-when'
+                    status: sold
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Pet not found
+      security:
+      - api_key: []
+      - petstore_auth:
+        - write:pets
+        - read:pets
+components:
+  schemas:
+    Pet:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: doggie
+        status:
+          type: string
+          description: pet status in the store
+          enum:
+          - available
+          - pending
+          - sold
+
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/Pet"

@@ -202,9 +202,13 @@ public class MockHandler implements ServerHandler {
         }
         String path = req.getPath();
         if (!path.isEmpty()) {
-            int pathSlashOffset = path.startsWith("/")? 1 : 0;
-            req.setPath(path.substring(prefix.length() + pathSlashOffset));
+            // fix for 35883300efc174275aa84bf18caa33f22516723f "[breaking] mock requestUri magic variable will no start with a forward-slash"
+            int prefixOffset = req.getPath().startsWith("/") && prefix.length() > 0 && !prefix.startsWith("/")? 1 : 0;
+            req.setPath(path.substring(prefix.length() + prefixOffset));
         }
+        // rare case when http-client is active within same jvm
+        // snapshot existing thread-local to restore
+        ScenarioEngine prevEngine = ScenarioEngine.get();
         for (MockHandlerHook hook : this.handlerHooks) {
             Response response = hook.beforeRequest(req);
             if(response != null){
@@ -278,6 +282,9 @@ public class MockHandler implements ServerHandler {
                     if (responseStatus != null) {
                         res.setStatus(responseStatus.getAsInt());
                     }
+                    if (prevEngine != null) {
+                        ScenarioEngine.set(prevEngine);
+                    }
                     if(result.isFailed()) {
                         for (MockHandlerHook hook : this.handlerHooks) {
                             logger.trace("Running 'afterScenarioFailure' from hook: {}", hook);
@@ -300,6 +307,9 @@ public class MockHandler implements ServerHandler {
             res = hook.noMatchingScenario(req, res, createScenarioEngine(req, runtime));
         }
         logger.warn("no scenarios matched, returning 404: {}", req); // NOTE: not logging with engine.logger
+        if (prevEngine != null) {
+            ScenarioEngine.set(prevEngine);
+        }
         return res;
     }
 

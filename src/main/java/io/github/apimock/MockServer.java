@@ -30,6 +30,8 @@ import com.intuit.karate.http.Request;
 import com.intuit.karate.http.Response;
 import com.intuit.karate.http.ServerHandler;
 import com.intuit.karate.http.SslContextFactory;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
@@ -48,6 +50,12 @@ public class MockServer extends HttpServer {
 
     MockServer(ServerBuilder sb) {
         super(sb);
+        HttpService httpStopService = (ctx, req) -> {
+            logger.debug("received command to stop server: {}", req.path());
+            this.stop();
+            return HttpResponse.of(HttpStatus.ACCEPTED);
+        };
+        sb.service("/__admin/stop", httpStopService);
     }
 
     public static class Builder extends MockServerBuilder {

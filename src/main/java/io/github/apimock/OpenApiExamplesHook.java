@@ -54,6 +54,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
     public void reload() {
         openApiValidator.reload();
         this.api = openApiValidator.getApi();
+        sequenceNext = 0;
     }
 
     @Override
