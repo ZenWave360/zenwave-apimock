@@ -33,6 +33,6 @@ jobs:
       - name: Upload fat-jar to release as release assets
         run: |
           TAG=${GITHUB_REF/refs\/tags\//}
-          gh release upload ${TAG} target/apimock.jar
+          gh release upload ${TAG} target/zenwave-apimock.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
