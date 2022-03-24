@@ -1,8 +1,11 @@
 package io.github.apimock;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -45,7 +48,7 @@ import static org.openapi4j.core.validation.ValidationSeverity.ERROR;
  */
 public class OpenApiValidator4Karate {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static Logger logger = LoggerFactory.getLogger(OpenApiValidator4Karate.class);
 
     private OpenApi3 api;
 
@@ -216,7 +219,13 @@ public class OpenApiValidator4Karate {
     }
 
     private static String fixUrl(String url) {
-        return url.startsWith("/")? url : "/" + url;
+        url = url.startsWith("/")? url : "/" + url;;
+        try {
+            return URLEncoder.encode(url, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("UnsupportedEncodingException UTF8 encoding request path",  e);
+            return url;
+        }
     }
 
     public static class ValidationResults {
