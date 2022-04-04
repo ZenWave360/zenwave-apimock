@@ -53,6 +53,56 @@ public class MockServerBuildTest {
         }
     }
 
+    @Test
+    public void test_build_mockserver_without_path() throws MalformedURLException {
+        MockServer server = MockServer.builder()
+                .openapi(getClasspathFile("petstore/petstore-openapi.yml"))
+                .features(Arrays.asList(getClasspathFile("petstore/mocks/PetMock/PetMock.feature")))
+                 .watch(true)
+                .http(0).build();
+        try {
+            String baseUrl = "http://localhost:" + server.getPort() + "/pet/";
+            RestTemplate restTemplate = new RestTemplate();
+            Map result = restTemplate.getForObject(baseUrl + 10, Map.class);
+        } finally {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void test_build_mockserver_with_path_prefix_relative() throws MalformedURLException {
+        MockServer server = MockServer.builder()
+                .openapi(getClasspathFile("petstore/petstore-openapi.yml"))
+                .features(Arrays.asList(getClasspathFile("petstore/mocks/PetMock/PetMock.feature")))
+                .pathPrefix("contextPath")
+                .watch(true)
+                .http(0).build();
+        try {
+            String baseUrl = "http://localhost:" + server.getPort() + "/contextPath/pet/";
+            RestTemplate restTemplate = new RestTemplate();
+            Map result = restTemplate.getForObject(baseUrl + 10, Map.class);
+        } finally {
+            server.stop();
+        }
+    }
+
+    @Test
+    public void test_build_mockserver_with_path_prefix_absolute() throws MalformedURLException {
+        MockServer server = MockServer.builder()
+                .openapi(getClasspathFile("petstore/petstore-openapi.yml"))
+                .features(Arrays.asList(getClasspathFile("petstore/mocks/PetMock/PetMock.feature")))
+                .pathPrefix("/contextPath")
+                .watch(true)
+                .http(0).build();
+        try {
+            String baseUrl = "http://localhost:" + server.getPort() + "/contextPath/pet/";
+            RestTemplate restTemplate = new RestTemplate();
+            Map result = restTemplate.getForObject(baseUrl + 10, Map.class);
+        } finally {
+            server.stop();
+        }
+    }
+
     private File getClasspathFile(String classpathResource) {
         return new File(getClass().getClassLoader().getResource(classpathResource).getFile());
     }
