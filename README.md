@@ -1,4 +1,4 @@
-# Test Doubles for REST APIs
+# ZenWave APIMock: Test Doubles for REST APIs
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.zenwave360/zenwave-apimock.svg?label=Maven%20Central&logo=apachemaven)](https://search.maven.org/artifact/io.github.zenwave360/zenwave-apimock) 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/ZenWave360/ApiMock?logo=GitHub)](https://github.com/ZenWave360/ApiMock/releases)
@@ -10,10 +10,10 @@
 
 Where OpenAPI meets KarateDSL Server Side Features for REST API mocking:
 
-- Powerful yet simple **stateful mocks using KarateDSL**.
+- Powerful yet simple **stateful mocks using KarateDSL**. You can even generate those mocks from your OpenAPI definition using [KarateIDE](https://marketplace.visualstudio.com/items?itemName=KarateIDE.karate-ide) vscode extension.
 - Request/response validation from your OpenAPI schemas.
 - **Declarative stateless mocks** from your OpenAPI examples with `'x-apimock-when'`.
-- Flexible and powerful built-in and custom defined **dynamic data generators** for your OpenAPI examples with `x-apimock-transform`.
+- Flexible and powerful **dynamic data generators** for your OpenAPI examples with `x-apimock-transform` (both built-in and custom defined).
 - Use openapi examples to **populate your karate mocks** initial data with `x-apimock-karate-var` and `x-apimock-seed`.
 
 Checkout [KarateIDE vscode extension](https://github.com/ZenWave360/karate-ide) for a powerful testing and mocking user experience for KarateDSL.
@@ -48,7 +48,7 @@ OpenAPI definitions are used to **validate** request/responses and to serve **dy
 - Populates karate features data sets from OpenAPI `'#/components/examples/'`.
 - Seed (multiply) mock data from a few OpenAPI examples.
 
-With KarateDSL you can:
+With KarateDSL you can create:
 
 - Simple yet powerful stateful mocks. See official [KarateDSL Mocks](https://github.com/karatelabs/karate/tree/master/karate-netty) for details.
 - Delegating validations to OpenAPI makes karate mocks even simpler.
@@ -187,7 +187,7 @@ Checkout this complete CRUD Example
 ```xml
 <dependency>
   <groupId>io.github.zenwave360</groupId>
-  <artifactId>apimock</artifactId>
+  <artifactId>zenwave-apimock</artifactId>
   <version>${apimock.version}</version>
 </dependency>
 ```
