@@ -79,7 +79,7 @@ public class MockServer extends HttpServer {
             }
             ServerHandler handler = watch ? new MockServer.ReloadingMockHandler(mockHandler, files) : mockHandler;
             HttpService service = new HttpServerHandler(handler);
-            sb.service("prefix:/" + prefix, service);
+            sb.service("prefix:" + (prefix == null ? "/" : prefix), service);
             return (T) new MockServer(sb);
         }
     }

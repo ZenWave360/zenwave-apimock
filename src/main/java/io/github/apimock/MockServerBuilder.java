@@ -25,7 +25,7 @@ public abstract class MockServerBuilder {
     File certFile;
     File keyFile;
     Map<String, Object> args;
-    String prefix = "";
+    String prefix = null;
     List<MockHandlerHook> hooks = new ArrayList<>();
 
     public MockServerBuilder openapi(File openapi) throws MalformedURLException {
@@ -97,7 +97,7 @@ public abstract class MockServerBuilder {
     }
 
     public MockServerBuilder pathPrefix(String prefix) {
-        this.prefix = prefix.replaceAll("^/", "");
+        this.prefix = prefix != null && !prefix.startsWith("/")? "/" + prefix : prefix;
         return this;
     }
 
