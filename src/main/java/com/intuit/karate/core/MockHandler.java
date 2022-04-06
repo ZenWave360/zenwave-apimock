@@ -131,7 +131,7 @@ public class MockHandler implements ServerHandler {
         for (MockHandlerHook hook : handlerHooks) {
             hook.reload();
         }
-        this.featureList.replaceAll(feature -> Feature.read(feature.getResource().getFile()));
+        this.featureList.replaceAll(feature -> Feature.read(feature.getResource()));
         for (Feature feature : featureList) {
             FeatureRuntime featureRuntime = FeatureRuntime.of(forTempUse(HttpClientFactory.DEFAULT), feature, args);
             Scenario dummy = createDummyScenario(feature);

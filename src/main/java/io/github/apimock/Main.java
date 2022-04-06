@@ -45,7 +45,7 @@ public class Main implements Callable<Void> {
     @CommandLine.Option(names = {"-W", "--watch"}, description = "watch (and hot-reload) mock server file for changes")
     boolean watch;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         String logbackConfig = System.getProperty(LOGBACK_CONFIG);
         if (StringUtils.isBlank(logbackConfig)) {
             File logbackXml = ResourceUtils.classPathOrFile("logback.xml");
