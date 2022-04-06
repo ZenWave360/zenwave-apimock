@@ -200,8 +200,9 @@ public class MockHandler implements ServerHandler {
             }
             return response;
         }
-        if (prefix != null && req.getPath().startsWith(prefix)) {
-            req.setPath(req.getPath().substring(prefix.length()));
+        String path = ("/" + req.getPath()).replaceFirst("^//", "/");
+        if (prefix != null && path.startsWith(prefix)) {
+            req.setPath(path.substring(prefix.length()));
         }
         // rare case when http-client is active within same jvm
         // snapshot existing thread-local to restore

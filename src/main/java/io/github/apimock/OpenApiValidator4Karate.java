@@ -116,7 +116,7 @@ public class OpenApiValidator4Karate {
 
     public static Operation findOperation(String method, String requestPath, OpenApi3 api) {
         List<Map.Entry<String, Path>> paths = api.getPaths().entrySet().stream()
-                .filter(e -> HttpUtils.parseUriPattern(e.getKey(), requestPath) != null)
+                .filter(e -> HttpUtils.parseUriPattern(e.getKey(), requestPath) != null ||HttpUtils.parseUriPattern(e.getKey(), "/" + requestPath) != null)
                 .collect(Collectors.toList());
         Path path = paths.size() == 1?
                 paths.get(0).getValue() :
@@ -221,7 +221,7 @@ public class OpenApiValidator4Karate {
     private static String fixUrl(String url) {
         url = url.startsWith("/")? url : "/" + url;;
         try {
-            return URLEncoder.encode(url, "UTF8");
+            return URLEncoder.encode(url, "UTF8").replaceAll("%2F", "/");
         } catch (UnsupportedEncodingException e) {
             logger.error("UnsupportedEncodingException UTF8 encoding request path",  e);
             return url;
