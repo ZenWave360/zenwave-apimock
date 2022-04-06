@@ -1,5 +1,7 @@
 package io.github.apimock;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.karate.Json;
 import com.intuit.karate.JsonUtils;
 import com.intuit.karate.core.Feature;
@@ -43,6 +45,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
 
     private final OpenApiValidator4Karate openApiValidator;
     private OpenApi3 api;
+    private ObjectMapper jacksonMapper = new ObjectMapper();
 
     public OpenApiExamplesHook(OpenApiValidator4Karate openApiValidator) {
         super();
@@ -197,9 +200,13 @@ public class OpenApiExamplesHook implements MockHandlerHook {
                     if(evalBooleanJs(engine, when.toString())) {
                         logger.debug("Found example[{}] for x-apimock-when {} in openapi for operationId {}", exampleEntry.getKey(), when, operation.getOperationId());
                         Example example = exampleEntry.getValue();
+                        Object seeds = firstNotNull(firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-seed"), 1);
+                        Map<String, Object> seedsMap = seeds instanceof Integer? defaultRootSeed((Integer) seeds): (Map<String, Object>) seeds;
+                        Object seededExample = seed(example.getValue(), seedsMap);
+
                         logger.debug("Returning example in openapi for operationId {}", operation.getOperationId());
                         response = new Response(Integer.valueOf(status.toLowerCase().replaceAll("x", "0")));
-                        response.setBody(processObjectDynamicProperties(engine, generators, example.getValue()));
+                        response.setBody(processObjectDynamicProperties(engine, generators, seededExample));
                         response.setContentType(mediaTypeEntry.getKey());
                         response.setHeader("access-control-allow-origin", "*");
                         break;
@@ -247,7 +254,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
             }
         }
 
-        String jsonString = json.toStringPretty();
+        String jsonString = toJsonPrettyString(json);
         final Matcher matcher = generatorsPattern.matcher(jsonString);
         while (matcher.find()) {
             String match = matcher.group(0);
@@ -259,6 +266,14 @@ public class OpenApiExamplesHook implements MockHandlerHook {
             }
         }
         return JsonUtils.toStrictJson(jsonString);
+    }
+
+    private String toJsonPrettyString(Json json) {
+        try {
+            return jacksonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(json.value());
+        } catch (JsonProcessingException e) {
+            return json.toStringPretty();
+        }
     }
 
     private void loadPathParams(String uri, String pattern, ScenarioEngine engine) {
