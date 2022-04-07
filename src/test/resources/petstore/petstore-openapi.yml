@@ -195,6 +195,7 @@ paths:
                   x-apimock-when: pathParams.petId > 0
                   x-apimock-transform:
                     id: pathParams.petId
+                    status: "Math.random() >= 0.5? 'sold' : 'available'"
                     creationDate: 'date("dd/MM/yyy", "-1d")'
                   value:
                     id: 0

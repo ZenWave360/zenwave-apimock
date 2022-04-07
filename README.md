@@ -99,7 +99,8 @@ responses:
             x-apimock-when: pathParams.petId > 0
             x-apimock-transform:
               id: pathParams.petId
-              $[*].creationDate: 'date("dd/MM/yyy", "-1d")'
+              status: "Math.random() >= 0.5? 'sold' : 'available'"
+              creationDate: 'date("dd/MM/yyyy", "-1d")'
             value:
               id: 0
               name: 'DOG {{Math.random()}}'
