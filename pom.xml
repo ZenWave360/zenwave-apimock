@@ -5,7 +5,7 @@
 
     <groupId>io.github.zenwave360</groupId>
     <artifactId>zenwave-apimock</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.1.0</version>
 	<packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -55,7 +55,7 @@
         <connection>scm:git:git://github.com/ZenWave360/apimock.git</connection>
         <developerConnection>scm:git:git@github.com:ZenWave360/ZenWave360.git</developerConnection>
         <url>https://github.com/ZenWave360/apimock</url>
-        <tag>HEAD</tag>
+        <tag>v0.1.0</tag>
     </scm>
 
     <build>
