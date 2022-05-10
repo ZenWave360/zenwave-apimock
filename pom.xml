@@ -12,6 +12,16 @@
     <description>ApiMock: Test Doubles for REST APIs with KarateDSL and OpenAPI</description>
     <url>https://github.com/ZenWave360/apimock</url>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <karate.version>1.2.0</karate.version>
+        <armeria.version>1.13.4</armeria.version>
+        <openapi4j.version>1.0.7</openapi4j.version>
+    </properties>
+
     <licenses>
         <license>
             <name>MIT License</name>
@@ -47,17 +57,6 @@
         <url>https://github.com/ZenWave360/apimock</url>
         <tag>HEAD</tag>
     </scm>
-
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <karate.version>1.2.0.RC5</karate.version>
-        <armeria.version>1.13.4</armeria.version>
-        <openapi4j.version>1.0.7</openapi4j.version>
-    </properties>
 
     <build>
         <plugins>
