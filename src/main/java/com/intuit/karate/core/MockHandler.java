@@ -100,7 +100,7 @@ public class MockHandler implements ServerHandler {
     }
 
     public MockHandler withPrefix(String prefix) {
-        this.prefix = prefix;
+        this.prefix = "/".equals(prefix) ? null : prefix;
         return this;
     }
 
