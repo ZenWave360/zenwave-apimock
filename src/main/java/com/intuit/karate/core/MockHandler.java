@@ -114,7 +114,7 @@ public class MockHandler implements ServerHandler {
         return this;
     }
 
-    private static Suite forTempUse(HttpClientFactory hcf) {
+    private Suite forTempUse(HttpClientFactory hcf) {
         try {
             return Suite.forTempUse(hcf);
         } catch (Throwable e) {
@@ -123,6 +123,19 @@ public class MockHandler implements ServerHandler {
             } catch (Exception ex) {
                 logger.error("Unknown version of karate, couldn't find Suite.forTempUse() method");
                 throw new RuntimeException("Unknown version of karate, couldn't find Suite.forTempUse() method", ex);
+            }
+        }
+    }
+
+    private Map<String, Variable> shallowCloneVariables(ScenarioEngine engine) {
+        try {
+            return engine.shallowCloneVariables();
+        } catch (Throwable e) {
+            try {
+                return (Map) ScenarioEngine.class.getMethod("detachVariables").invoke(null);
+            } catch (Exception ex) {
+                logger.error("Unknown version of karate, couldn't find ScenarioEngine.shallowCloneVariables() method");
+                throw new RuntimeException("Unknown version of karate, couldn't find ScenarioEngine.shallowCloneVariables() method", ex);
             }
         }
     }
@@ -155,7 +168,7 @@ public class MockHandler implements ServerHandler {
                 }
             }
             corsEnabled = corsEnabled || runtime.engine.getConfig().isCorsEnabled();
-            globals.putAll(runtime.engine.detachVariables());
+            globals.putAll(shallowCloneVariables(runtime.engine));
             runtime.logger.info("mock server initialized: {}", feature);
             this.features.put(feature, runtime);
         }
@@ -251,7 +264,7 @@ public class MockHandler implements ServerHandler {
                     responseStatus = engine.vars.remove(ScenarioEngine.RESPONSE_STATUS);
                     responseHeaders = engine.vars.remove(ScenarioEngine.RESPONSE_HEADERS);
                     responseDelay = engine.vars.remove(RESPONSE_DELAY);
-                    globals.putAll(engine.detachVariables());
+                    globals.putAll(engine.shallowCloneVariables());
                     Response res = new Response(200);
                     if (result.isFailed()) {
                         response = new Variable(result.getError().getMessage());
