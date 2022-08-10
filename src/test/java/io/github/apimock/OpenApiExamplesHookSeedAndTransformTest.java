@@ -38,7 +38,7 @@ public class OpenApiExamplesHookSeedAndTransformTest {
         globalVars.put("variable", new Variable(new ArrayList<>()));
         Map<Feature, ScenarioRuntime> featureScenarioRuntimeMap = createTestFeatureScenarioRuntimeMap();
 
-        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromClasspath("openapi-examples/transforms-value.yml"));
+        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromURL(MockServer.getURL("classpath:openapi-examples/transforms-value.yml")));
         examplesHook.onSetup(featureScenarioRuntimeMap, globalVars);
         Object value = globalVars.get("variable").getValue();
 
@@ -52,7 +52,7 @@ public class OpenApiExamplesHookSeedAndTransformTest {
         globalVars.put("variable", new Variable(new ArrayList<>()));
         Map<Feature, ScenarioRuntime> featureScenarioRuntimeMap = createTestFeatureScenarioRuntimeMap();
 
-        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromClasspath("openapi-examples/transforms-array-items.yml"));
+        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromURL(MockServer.getURL("classpath:openapi-examples/transforms-array-items.yml")));
         examplesHook.onSetup(featureScenarioRuntimeMap, globalVars);
 
         Object value = globalVars.get("variable").getValue();
@@ -66,7 +66,7 @@ public class OpenApiExamplesHookSeedAndTransformTest {
         globalVars.put("variable", new Variable(new ArrayList<>()));
         Map<Feature, ScenarioRuntime> featureScenarioRuntimeMap = createTestFeatureScenarioRuntimeMap();
 
-        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromClasspath("openapi-examples/seed-as-integer.yml"));
+        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromURL(MockServer.getURL("classpath:openapi-examples/seed-as-integer.yml")));
         examplesHook.onSetup(featureScenarioRuntimeMap, globalVars);
 
         Object value = globalVars.get("variable").getValue();
@@ -79,7 +79,7 @@ public class OpenApiExamplesHookSeedAndTransformTest {
         globalVars.put("variable", new Variable(new ArrayList<>()));
         Map<Feature, ScenarioRuntime> featureScenarioRuntimeMap = createTestFeatureScenarioRuntimeMap();
 
-        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromClasspath("openapi-examples/seed-as-map.yml"));
+        OpenApiExamplesHook examplesHook = new OpenApiExamplesHook(OpenApiValidator4Karate.fromURL(MockServer.getURL("classpath:openapi-examples/seed-as-map.yml")));
         examplesHook.onSetup(featureScenarioRuntimeMap, globalVars);
 
         Object value = globalVars.get("variable").getValue();

@@ -37,9 +37,13 @@ import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.ServerBuilder;
 
 import java.io.File;
-import java.util.Date;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +60,29 @@ public class MockServer extends HttpServer {
             return HttpResponse.of(HttpStatus.ACCEPTED);
         };
         sb.service("/__admin/stop", httpStopService);
+    }
+
+    public static URL getURLForClassPathArtifact(final String artifactId, String filename) throws IOException {
+        final Pattern regex = Pattern.compile("\\/" + artifactId + "(\\/|-.+.jar)");
+        final Enumeration<URL> urls = OpenApiValidator4Karate.class.getClassLoader().getResources(filename);
+        while (urls.hasMoreElements()) {
+            final URL url = urls.nextElement();
+            if (regex.matcher(url.getFile()).find()) {
+                return url;
+            }
+        }
+        throw new RuntimeException("Resource " + filename + " not found in classpath with artifactId " + artifactId);
+    }
+
+    public static URL getURL(String filename) {
+        if(filename.startsWith("classpath:")) {
+            return OpenApiValidator4Karate.class.getClassLoader().getResource(filename.replaceFirst("classpath:", ""));
+        }
+        try {
+            return new File(filename).toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static class Builder extends MockServerBuilder {

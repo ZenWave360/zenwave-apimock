@@ -5,6 +5,7 @@ import com.intuit.karate.core.MockHandlerHook;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,16 +38,13 @@ public abstract class MockServerBuilder {
         return this.openapi(openApiValidator);
     }
 
-    public MockServerBuilder openapi(String openapi) throws Exception {
-        if (openapi.startsWith("classpath:")) {
-            OpenApiValidator4Karate openApiValidator = OpenApiValidator4Karate.fromClasspath(openapi.replace("classpath:", ""));
-            return this.openapi(openApiValidator);
-        }
-        return this.openapi(new File(openapi));
+    public MockServerBuilder openapi(String ...apis) throws Exception {
+        URL[] urls = Arrays.stream(apis).map(openapi -> MockServer.getURL(openapi)).toArray(i -> new URL[i]);
+        return openapi(urls);
     }
 
-    public MockServerBuilder openapi(final String artifactId, String filename) throws Exception {
-        OpenApiValidator4Karate openApiValidator = OpenApiValidator4Karate.fromClasspathArtifactId(artifactId, filename);
+    public MockServerBuilder openapi(URL ...urls) throws MalformedURLException {
+        OpenApiValidator4Karate openApiValidator = OpenApiValidator4Karate.fromURL(urls);
         return this.openapi(openApiValidator);
     }
 

@@ -1,12 +1,14 @@
 package io.github.apimock;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import org.openapi4j.operation.validator.model.impl.Body;
 import org.openapi4j.operation.validator.model.impl.DefaultRequest;
 import org.openapi4j.operation.validator.model.impl.DefaultResponse;
 import org.openapi4j.operation.validator.validation.RequestValidator;
-import org.openapi4j.parser.OpenApi3Parser;
+//import org.openapi4j.parser.OpenApi3Parser;
 import org.openapi4j.parser.model.v3.MediaType;
 import org.openapi4j.parser.model.v3.OpenApi3;
 import org.openapi4j.parser.model.v3.Operation;
@@ -69,45 +71,24 @@ public class OpenApiValidator4Karate {
         this.validator = new RequestValidator(vdc, api);
     }
 
-    public static OpenApiValidator4Karate fromURL(final String url) throws MalformedURLException {
-        return fromURL(new URL(url));
-    }
-
-    public static OpenApiValidator4Karate fromURL(final URL url) {
+    public static OpenApiValidator4Karate fromURL(final URL ...urls) {
         try {
-            OpenApi3 api = new OpenApi3Parser().parse(url, false);
+            OpenApi3 api = new OpenApi3Parser().parse(urls);
             if(api.getExtensions() == null) {
                 api.setExtensions(new HashMap<>());
             }
-            api.getExtensions().put("x-apimock-internal-url", url);
+            api.getExtensions().put("x-apimock-internal-urls", urls);
             return new OpenApiValidator4Karate(api);
         } catch (ResolutionException | ValidationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static OpenApiValidator4Karate fromClasspath(String filename) throws Exception {
-        final URL url = OpenApiValidator4Karate.class.getClassLoader().getResource(filename);
-        return fromURL(url);
-    }
-
-    public static OpenApiValidator4Karate fromClasspathArtifactId(final String artifactId, String filename) throws Exception {
-        final Pattern regex = Pattern.compile("\\/" + artifactId + "(\\/|-.+.jar)");
-        final Enumeration<URL> urls = OpenApiValidator4Karate.class.getClassLoader().getResources(filename);
-        while (urls.hasMoreElements()) {
-            final URL url = urls.nextElement();
-            if (regex.matcher(url.getFile()).find()) {
-                return fromURL(url);
-            }
-        }
-        throw new RuntimeException("Resource " + filename + " not found in classpath with artifactId " + artifactId);
-    }
-
     public void reload() {
-        URL url = (URL) this.api.getExtensions().get("x-apimock-internal-url");
-        logger.debug("Loading {} from {}", this.getClass().getSimpleName(), url);
-        if(url != null) {
-            OpenApiValidator4Karate reloaded = fromURL(url);
+        URL[] urls = (URL[]) this.api.getExtensions().get("x-apimock-internal-urls");
+        logger.debug("Loading {} from {}", this.getClass().getSimpleName(), urls);
+        if(urls != null) {
+            OpenApiValidator4Karate reloaded = fromURL(urls);
             this.api = reloaded.api;
             this.validator = reloaded.validator;
             this.ignoreNoNullable = reloaded.ignoreNoNullable;

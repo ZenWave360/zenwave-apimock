@@ -1,0 +1,27 @@
+components:
+  examples:
+    karate-pets:
+      summary: Pets for karate mocks dataset
+      x-apimock-karate-var: pets
+      x-apimock-seed: 20
+      x-apimock-transform:
+        $[*].id: sequenceNext()
+        $[*].status: "Math.random() >= 0.5? 'sold' : 'available'"
+      value:
+        - id: 0
+          name: 'Dog Name {{Math.random()}}'
+          category:
+            id: 1
+            name: DOG
+          photoUrls: []
+          status: sold
+        - id: 0
+          name: 'Cat Name {{Math.random()}}'
+          category:
+            id: 2
+            name: CAT
+          photoUrls: []
+          tags:
+            - id: 0
+              name: 'Cat'
+          status: sold
