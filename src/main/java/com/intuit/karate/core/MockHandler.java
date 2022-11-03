@@ -28,6 +28,7 @@ import com.intuit.karate.KarateException;
 import com.intuit.karate.ScenarioActions;
 import com.intuit.karate.StringUtils;
 import com.intuit.karate.Suite;
+import com.intuit.karate.core.compatibility.KarateCompatibility;
 import com.intuit.karate.graal.JsValue;
 import com.intuit.karate.http.HttpClientFactory;
 import com.intuit.karate.http.HttpUtils;
@@ -38,6 +39,7 @@ import com.intuit.karate.http.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,27 +116,16 @@ public class MockHandler implements ServerHandler {
         return this;
     }
 
-    private Suite forTempUse(HttpClientFactory hcf) {
-        try {
-            return Suite.forTempUse(hcf);
-        } catch (Throwable e) {
-            try {
-                return (Suite) Suite.class.getMethod("forTempUse").invoke(null);
-            } catch (Exception ex) {
-                logger.error("Unknown version of karate, couldn't find Suite.forTempUse() method");
-                throw new RuntimeException("Unknown version of karate, couldn't find Suite.forTempUse() method", ex);
-            }
-        }
-    }
-
     private Map<String, Variable> shallowCloneVariables(ScenarioEngine engine) {
         try {
             return engine.shallowCloneVariables();
         } catch (Throwable e) {
             try {
-                return (Map) ScenarioEngine.class.getMethod("detachVariables").invoke(null);
+                Method method = ScenarioEngine.class.getDeclaredMethod("detachVariables", null);
+                method.setAccessible(true);
+                return (Map) method.invoke(engine);
             } catch (Exception ex) {
-                logger.error("Unknown version of karate, couldn't find ScenarioEngine.shallowCloneVariables() method");
+                logger.error("Unknown version of karate, couldn't find ScenarioEngine.shallowCloneVariables() method", ex);
                 throw new RuntimeException("Unknown version of karate, couldn't find ScenarioEngine.shallowCloneVariables() method", ex);
             }
         }
@@ -146,7 +137,7 @@ public class MockHandler implements ServerHandler {
         }
         this.featureList.replaceAll(feature -> Feature.read(feature.getResource()));
         for (Feature feature : featureList) {
-            FeatureRuntime featureRuntime = FeatureRuntime.of(forTempUse(HttpClientFactory.DEFAULT), feature, args);
+            FeatureRuntime featureRuntime = KarateCompatibility.featureRuntimeOf(feature, args); // FeatureRuntime.of(forTempUse(HttpClientFactory.DEFAULT), feature, args);
             Scenario dummy = createDummyScenario(feature);
             ScenarioRuntime runtime = new ScenarioRuntime(featureRuntime, dummy);
             initRuntime(runtime);
@@ -342,7 +333,7 @@ public class MockHandler implements ServerHandler {
     }
 
     private ScenarioEngine createScenarioEngine(Request req, ScenarioRuntime runtime) {
-        ScenarioEngine engine = new ScenarioEngine(runtime, new HashMap<>(globals));
+        ScenarioEngine engine = KarateCompatibility.newScenarioEngine(runtime, new HashMap<>(globals));// new ScenarioEngine(runtime, new HashMap<>(globals));
         ScenarioEngine.set(engine);
         engine.init();
         engine.setVariable(ScenarioEngine.REQUEST_URL_BASE, req.getUrlBase());

@@ -9,6 +9,8 @@ import com.intuit.karate.core.MockHandlerHook;
 import com.intuit.karate.core.ScenarioEngine;
 import com.intuit.karate.core.ScenarioRuntime;
 import com.intuit.karate.core.Variable;
+import com.intuit.karate.core.compatibility.Karate;
+import com.intuit.karate.core.compatibility.KarateCompatibility;
 import com.intuit.karate.http.HttpUtils;
 import com.intuit.karate.http.Request;
 import com.intuit.karate.http.Response;
@@ -76,7 +78,7 @@ public class OpenApiExamplesHook implements MockHandlerHook {
         }
 
         if(api.getComponents() != null && api.getComponents().getExamples() != null) {
-            ScenarioEngine engine = new ScenarioEngine(features.values().stream().findFirst().get(), new HashMap<>(globals));
+            ScenarioEngine engine = KarateCompatibility.newScenarioEngine(features.values().stream().findFirst().get(), new HashMap<>(globals));
             engine.init();
             for (Example example : api.getComponents().getExamples().values()) {
                 String karateVar = (String) firstNotNull(example.getExtensions(), Collections.emptyMap()).get("x-apimock-karate-var");

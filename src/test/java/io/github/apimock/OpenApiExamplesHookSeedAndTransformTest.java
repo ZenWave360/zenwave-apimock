@@ -10,6 +10,7 @@ import com.intuit.karate.core.FeatureRuntime;
 import com.intuit.karate.core.MockHandler;
 import com.intuit.karate.core.ScenarioRuntime;
 import com.intuit.karate.core.Variable;
+import com.intuit.karate.core.compatibility.KarateCompatibility;
 import com.intuit.karate.http.HttpClientFactory;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.Assert;
@@ -25,7 +26,7 @@ public class OpenApiExamplesHookSeedAndTransformTest {
 
     Map<Feature, ScenarioRuntime> createTestFeatureScenarioRuntimeMap() {
         Feature feature = Feature.read("classpath:io/github/apimock/default.feature");
-        FeatureRuntime featureRuntime = FeatureRuntime.of(Suite.forTempUse(HttpClientFactory.DEFAULT), feature, new HashMap<>());
+        FeatureRuntime featureRuntime = KarateCompatibility.featureRuntimeOf(feature, new HashMap<>()); // FeatureRuntime.of(Suite.forTempUse(HttpClientFactory.DEFAULT), feature, new HashMap<>());
         ScenarioRuntime runtime = new ScenarioRuntime(featureRuntime, MockHandler.createDummyScenario(feature));
         Map<Feature, ScenarioRuntime> featureScenarioRuntimeMap = new HashMap();
         featureScenarioRuntimeMap.put(feature, runtime);
