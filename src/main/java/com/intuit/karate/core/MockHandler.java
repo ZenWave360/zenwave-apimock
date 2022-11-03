@@ -255,7 +255,7 @@ public class MockHandler implements ServerHandler {
                     responseStatus = engine.vars.remove(ScenarioEngine.RESPONSE_STATUS);
                     responseHeaders = engine.vars.remove(ScenarioEngine.RESPONSE_HEADERS);
                     responseDelay = engine.vars.remove(RESPONSE_DELAY);
-                    globals.putAll(engine.shallowCloneVariables());
+                    globals.putAll(shallowCloneVariables(engine));
                     Response res = new Response(200);
                     if (result.isFailed()) {
                         response = new Variable(result.getError().getMessage());
