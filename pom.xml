@@ -15,9 +15,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <karate.version>1.4.0</karate.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <karate.version>1.4.1</karate.version>
         <armeria.version>1.13.4</armeria.version>
         <openapi4j.version>1.0.7</openapi4j.version>
         <jackson-dataformat-yaml.version>2.14.2</jackson-dataformat-yaml.version>
@@ -255,12 +255,12 @@
             <artifactId>openapi-operation-validator</artifactId>
             <version>${openapi4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.linecorp.armeria</groupId>
-            <artifactId>armeria</artifactId>
-            <version>${armeria.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.linecorp.armeria</groupId>-->
+<!--            <artifactId>armeria</artifactId>-->
+<!--            <version>${armeria.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
@@ -318,7 +318,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.2.4</version>
+                        <version>3.5.2</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>

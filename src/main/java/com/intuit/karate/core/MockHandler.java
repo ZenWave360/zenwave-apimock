@@ -39,6 +39,7 @@ import com.intuit.karate.http.ServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -188,7 +189,7 @@ public class MockHandler implements ServerHandler {
         runtime.engine.init();
     }
 
-    private static final Result PASSED = Result.passed(0);
+    private static final Result PASSED = passed();
     private static final String ALLOWED_METHODS = "GET, HEAD, POST, PUT, DELETE, PATCH";
 
     @Override
@@ -441,4 +442,25 @@ public class MockHandler implements ServerHandler {
         }
     }
 
+    private static Result passed() {
+        try {
+            Method method = Result.class.getMethod("passed", long.class, long.class);
+            return (Result) method.invoke(null, 0L, 0L);
+        } catch (NoSuchMethodException ignored) {
+            // ignored
+        }
+        catch(InvocationTargetException|IllegalAccessException e) {
+            System.err.println("Error invoking method: Result.passed(0, 0). Please upgrade to karate +1.4.1"); // karate 1.4.1
+        }
+        try {
+            Method method = Result.class.getMethod("passed", long.class);
+            return (Result) method.invoke(null, 0L);
+        } catch (NoSuchMethodException ignored) {
+            // ignored
+        }
+        catch(InvocationTargetException|IllegalAccessException e) {
+            System.err.println("Error invoking method: Result.passed(0)"); // karate 1.4.0
+        }
+        return Result.passed(0, 0);
+    }
 }
